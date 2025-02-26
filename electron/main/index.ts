@@ -1,0 +1,40 @@
+import path from 'path'
+import { fileURLToPath } from 'url'
+import chalk from 'chalk'
+import { app, BrowserWindow, ipcMain } from 'electron'
+
+const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+let win: BrowserWindow | null
+
+void app.whenReady().then(() => {
+  win = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      sandbox: true,
+      preload: path.join(__dirname, 'preload.js'),
+    },
+  })
+
+  const isDev = !app.isPackaged
+  if (isDev) {
+    if (VITE_DEV_SERVER_URL === undefined) {
+      console.error(chalk.red('Error: VITE_DEV_SERVER_URL is not defined. Exiting...'))
+      app.quit()
+      return
+    }
+    console.log(chalk.green(`Running in development mode with VITE_DEV_SERVER_URL=${VITE_DEV_SERVER_URL}`))
+    void win.loadURL(VITE_DEV_SERVER_URL)
+  } else {
+    void win.loadFile(path.join(__dirname, '../../www/index.html')) // Load built files in production
+  }
+})
+
+ipcMain.on('request', (event, arg) => {
+  console.log('Received message from renderer:', arg)
+  event.reply('reply', 'pong')
+})
