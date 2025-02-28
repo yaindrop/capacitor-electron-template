@@ -11,6 +11,7 @@ const childProcesses = new Set<ChildProcess>()
 
 async function main() {
   catchExit(() => {
+    console.log(tag, 'Cleaning up...')
     for (const child of childProcesses) {
       child.kill('SIGTERM')
     }

@@ -2,9 +2,12 @@
 import { ChildProcess, spawn } from 'child_process'
 import chalk from 'chalk'
 import chokidar, { FSWatcher } from 'chokidar'
+import supportsColor from 'supports-color'
 
 import { paths } from './paths'
 import { catchExit, spacedLog, tagStdio, waitProcessStdout } from './utils'
+
+const FORCE_COLOR = supportsColor.stdout !== false ? '1' : '0'
 
 const tag = chalk.magenta('[electron-dev]')
 
@@ -36,7 +39,7 @@ function refresh() {
   electronProcesses.clear()
 
   const child = spawn('electron', [paths.distMain], {
-    env: { ...process.env, VITE_DEV_SERVER_URL: viteDevServerUrl },
+    env: { ...process.env, FORCE_COLOR, VITE_DEV_SERVER_URL: viteDevServerUrl },
   })
   tagStdio(child, tagElectron)
   electronProcesses.add(child)
@@ -72,6 +75,7 @@ function debouncedRefresh() {
 // MARK: main
 async function main() {
   catchExit(async () => {
+    console.log(tag, 'Cleaning up...')
     for (const child of childProcesses) {
       child.kill('SIGTERM')
     }
@@ -84,7 +88,7 @@ async function main() {
   {
     spacedLog(tag, '(1/4)', 'Starting web dev server')
     const child = spawn('vite', ['--config', paths.viteConfig], {
-      env: { ...process.env, FORCE_COLOR: '1' },
+      env: { ...process.env, FORCE_COLOR },
     })
     childProcesses.add(child)
     tagStdio(child, tagWebDev)
@@ -100,7 +104,7 @@ async function main() {
   {
     spacedLog(tag, '(2/4)', 'Starting electron main build watch')
     const child = spawn('vite', ['build', '--watch', '--config', paths.viteConfigMain], {
-      env: { ...process.env, FORCE_COLOR: '1' },
+      env: { ...process.env, FORCE_COLOR },
     })
     childProcesses.add(child)
     tagStdio(child, tagElectronBuildMain)
@@ -109,7 +113,7 @@ async function main() {
   {
     spacedLog(tag, '(3/4)', 'Starting electron preload build watch')
     const child = spawn('vite', ['build', '--watch', '--config', paths.viteConfigPreload], {
-      env: { ...process.env, FORCE_COLOR: '1' },
+      env: { ...process.env, FORCE_COLOR },
     })
     childProcesses.add(child)
     tagStdio(child, tagElectronBuildPreload)

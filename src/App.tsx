@@ -1,3 +1,4 @@
+import chalk from 'chalk'
 import { useEffect, useState } from 'react'
 
 declare global {
@@ -18,6 +19,7 @@ function App() {
     })
 
     window.ipcRenderer.send('request', 'ping')
+    console.log(chalk.green('Sent request to main process'))
   }, [])
 
   return (

@@ -23,13 +23,14 @@ void app.whenReady().then(() => {
   const isDev = !app.isPackaged
   if (isDev) {
     if (VITE_DEV_SERVER_URL === undefined) {
-      console.error(chalk.red('Error: VITE_DEV_SERVER_URL is not defined. Exiting...'))
+      console.error(chalk.red('Error: VITE_DEV_SERVER_URL is undefined. Exiting...'))
       app.quit()
       return
     }
-    console.log(chalk.green(`Running in development mode with VITE_DEV_SERVER_URL=${VITE_DEV_SERVER_URL}`))
+    console.log('Running in', chalk.blue('development'), 'mode with:', `VITE_DEV_SERVER_URL=${VITE_DEV_SERVER_URL}`)
     void win.loadURL(VITE_DEV_SERVER_URL)
   } else {
+    console.log('Running in', chalk.magenta('production'), 'mode')
     void win.loadFile(path.join(__dirname, '../../www/index.html')) // Load built files in production
   }
 })
