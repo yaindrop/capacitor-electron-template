@@ -8,5 +8,5 @@
     "resolveJsonModule": true,
     "strict": true
   },
-  "include": ["electron", "eslint.config.ts", "package.json", "vite.config.ts", "test.ts"]
+  "include": ["electron", "eslint.config.ts", "package.json", "vite.config.ts"]
 }
